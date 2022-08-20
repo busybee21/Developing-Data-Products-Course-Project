@@ -1,0 +1,11 @@
+name: myapp
+title:
+username:
+account: busybee21
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6816283
+bundleId: 6221036
+url: https://busybee21.shinyapps.io/myapp/
+when: 1661012200.23017
+lastSyncTime: 1661012200.2302
