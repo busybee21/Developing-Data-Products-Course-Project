@@ -1,0 +1,84 @@
+---
+title: "Reproducible Pitch"
+author: "Snehadrita Das"
+date: "2022-08-20"
+output: ioslides_presentation
+---
+
+## About the Course Project  
+* The course and course project details can be found here:   
+https://www.coursera.org/learn/data-products/peer/tMYrn/course-project-shiny-application-and-reproducible-pitch  
+* The link to my github page for ui.R and server.R codes:   
+
+https://github.com/busybee21/Developing-Data-Products-Course-Project/tree/main/MyApp
+
+* Link to the Shiny App:  
+https://busybee21.shinyapps.io/myapp/
+
+## Methodology   
+* We shall consider the GaltonFamilies data set from the HistData package. And we shall built our shiny app to predict the child's height using linear regression for given value of heights of father and mother.  
+* Move the slider to input the values of heights for prediction purpose. The other tab in the shiny app website has the documentation for the dataset.  
+
+## R code and ui.R  
+
+```{r}
+library(HistData); head(GaltonFamilies,3)
+model<-lm(childHeight~father+mother,data=GaltonFamilies); model$coef
+```
+
+```{r,results='hide'}
+library(shiny)  ## ui.R
+library(HistData)
+
+shinyUI(fluidPage(
+     titlePanel("Prediction of Child Height from GaltonFamilies dataset"),
+     sidebarLayout(
+          sidebarPanel(
+               sliderInput("sliderfather","Value of the Father's Height",55,80,value = 65),
+               sliderInput("slidermother","Value of the Mother's Height",55,80,value = 60),
+               
+          ),
+          mainPanel(
+               tabsetPanel(type = "tabs",
+                           tabPanel("Main Output",
+                                    h3("Summary of Model Coefficients"),
+                                    textOutput("fit.summary"),
+                                    
+                                    h3("Predicted Child's Height:"),
+                                    textOutput("predicted")),
+                           tabPanel("Documentation",
+                                    h3("GaltonFamilies dataset has been considered"),
+                                    helpText("This data set lists the individual observations for 934 children in 205 families on which Galton (1886) based his cross-tabulation."),
+                                    h3("For given heights of father and mother, child's height would be predicted"),
+                                    helpText("Depending library for this dataset is UsingR")),
+                           
+               )
+          ))
+))
+
+
+```
+
+## Server.R  
+
+```{r}
+library(shiny)
+library(HistData)
+
+shinyServer(function(input,output){
+     model<-lm(childHeight~father+mother,data=GaltonFamilies)
+     
+     model.pred<-reactive({
+          father.input<-input$sliderfather
+          mother.input<-input$slidermother
+          predict(model,newdata=data.frame(father=father.input,mother=mother.input))
+     })
+     output$fit.summary<-renderText({
+         model$coefficients
+     })
+     output$predicted<-renderText({
+          model.pred()
+     })
+})
+
+```
